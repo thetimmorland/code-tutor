@@ -1,23 +1,20 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from "axios";
+
 import './app.css';
-import ReactImage from './react.png';
 
-export default class App extends Component {
-  state = { username: null };
+export default function App() {
 
-  componentDidMount() {
-    fetch('/api/getUsername')
-      .then(res => res.json())
-      .then(user => this.setState({ username: user.username }));
-  }
+  const [username, setUsername] = useState(null);
 
-  render() {
-    const { username } = this.state;
-    return (
-      <div>
-        {username ? <h1>{`Hello ${username}`}</h1> : <h1>Loading.. please wait!</h1>}
-        <img src={ReactImage} alt="react" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    axios.get('/api/username')
+      .then(res => setUsername(res.data));
+  }, []);
+
+  return (
+    <div>
+      {username ? <h1>{`Hello ${username}`}</h1> : <h1>Loading.. please wait!</h1>}
+    </div>
+  );
 }
