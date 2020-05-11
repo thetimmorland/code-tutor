@@ -1,50 +1,84 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
 
 import AceEditor from "react-ace";
-
+import "ace-builds/webpack-resolver";
 import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/theme-github";
+
+import constructApi from "./constructApi";
 
 export default function App() {
   const [code, setCode] = useState("");
-  const [error, setError] = useState(null);
-  const canvasRef = useRef(null)
+  const [log, setLog] = useState("");
+
+  const [api, setApi] = useState([]);
+  const [handlers, setHandlers] = useState({});
+
+  const [worker, setWorker] = useState(null);
+  const [canvas, setCanvas] = useState(null);
+  const [ctx, setCtx] = useState(null);
+
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-  }, [])
-
-  useEffect(() => {
-    if (!code || !canvasRef ) return;
-
     const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
-    try {
-      eval(code);
-      setError("Success!")
-    } catch (err) {
-      console.log(err);
-      setError(err.toString())
-    }
-  }, [code]);
+    const funcs = [
+      function setHeight(height) {
+        if (height) {
+          canvas.height = height;
+        }
+      },
+
+      function setWidth(width) {
+        if (width) {
+          canvas.width = width;
+        }
+      },
+    ];
+
+    const [newApi, newHandlers] = constructApi(funcs)
+    setApi(newApi);
+    setHandlers(newHandlers);
+  }, [canvasRef]);
+
+  const run = () => {
+    if (worker) worker.terminate();
+
+    const blob = new Blob([code, ...api], { type: "text/javascript" });
+    const workerUrl = URL.createObjectURL(blob);
+    setWorker(new Worker(workerUrl));
+  };
+
+  useEffect(() => {
+    if (!worker) return;
+
+    worker.addEventListener("message", ({ data }) => {
+      console.log(data);
+      console.log(handlers);
+      handlers[data.name](...data.params);
+    });
+
+    worker.addEventListener("error", (event) => {
+      console.log(event);
+    });
+  }, [worker]);
 
   return (
-    <div style={{ margin: 10 }}>
-      <div style={{display: "flex", alignItems: "flex-start"}}>
-        <AceEditor
-          mode="javascript"
-          theme="github"
-          value={code}
-          onChange={(code) => setCode(code)}
-          style={{ margin: 10 }}
-        />
-        <canvas
-          ref={canvasRef}
-          style={{ margin: 10, border: "1px solid black" }}
-        />
-      </div>
-      <div style={{height: 250, width: "100%", overflow: "auto", backgroundColor: "gray"}}>
-        {error ? error : "Ready to Run"}
+    <div style={{ display: "flex", alignItems: "flex-start", padding: 10 }}>
+      <AceEditor
+        value={code}
+        mode="javascript"
+        onChange={(code) => setCode(code)}
+        style={{ marginRight: 10 }}
+      />
+      <div>
+        <div style={{ marginBottom: 5 }}>
+          <button style={{ marginRight: 5 }} onClick={run}>
+            Run
+          </button>
+        </div>
+        <canvas ref={canvasRef} style={{ border: "1px solid black" }} />
       </div>
     </div>
   );
