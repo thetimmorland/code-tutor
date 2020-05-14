@@ -42,5 +42,9 @@ button {
 .Log > p {
   font-family: Consolas, monaco, monospace;
   font-size: 12px;
-  margin: 8px 8px 0px 8px;
+  border-bottom: thin grey solid;
+  margin: 8px;
+}
+
+.Log > p:not(:last-child) {
 }
