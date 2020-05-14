@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/thetimmorland/code-tutor/issues"
   },
-  "homepage": "https://github.com/thetimmorland/code-tutor#readme"
+  "homepage": "https://github.com/thetimmorland/code-tutor#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
