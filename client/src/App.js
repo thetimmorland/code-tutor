@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import "./App.css";
+
 import Sketch from "./Sketch";
 import Editor from "./Editor";
 import Log from "./Log";
@@ -8,7 +10,7 @@ export default function App() {
   const [code, setCode] = useState(
     "function setup() {\n" +
       "  // put setup code here\n" +
-      "  createCanvas(400, 400);\n" +
+      "  createCanvas(windowWidth, windowHeight);\n" +
       "}\n" +
       "\n" +
       "function draw() {\n" +
@@ -18,31 +20,32 @@ export default function App() {
       "}\n"
   );
 
-  const [log, setLog] = useState([]);
+  const [log, setLog] = useState(["test", "test2"]);
 
   const handleChange = (newCode) => {
     setCode(newCode);
   };
 
+  const runSketch = () => {};
+
+  const stopSketch = () => {};
+
   return (
-    <div style={{ height: "100vh", display: "flex" }}>
-      <div
-        style={{
-          flex: 0.5,
-          margin: 4,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <div style={{ flex: 0.75 }}>
-          <Editor value={code} onChange={handleChange} />
+    <div className="App">
+      <div className="Column">
+        <div className="ButtonBar">
+          <button className="StartButton" onClick={runSketch}>
+            {"\u25B6"}
+          </button>
+          <button className="StopButton" onClikc={stopSketch}>
+            {"\u25A0"}
+          </button>
         </div>
-        <div style={{ flex: 0.25 }}>
-          <Log value={log} />
-        </div>
+        <Editor className="Editor" value={code} onChange={handleChange} />
+        <Log className="Log" value={log} />
       </div>
-      <div style={{ flex: 0.5, margin: 4 }}>
-        <Sketch value={code} />
+      <div className="Column">
+        <Sketch code={code} />
       </div>
     </div>
   );

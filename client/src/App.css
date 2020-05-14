@@ -1,38 +1,46 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  display: flex;
   min-height: 100vh;
+}
+
+.Column {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  flex: 0.5;
 }
 
-.App-link {
-  color: #61dafb;
+/* Columns which are not the last child */
+.Column:not(:last-child) {
+  border-right: thin grey solid;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+/* Divs which are chilren of a column but are not the last child */
+.Column > div:not(:last-child) {
+  border-bottom: thin grey solid;
+}
+
+button {
+  margin: 8px 0px 8px 8px;
+  font-size: 16px;
+  text-decoration: none;
+  border: thin grey solid;
+}
+
+.StartButton {
+  color: #22863A;
+}
+
+.StopButton {
+  color: #D73A49;
+}
+
+.Log {
+  overflow-y: auto;
+  height: 20em;
+}
+
+.Log > p {
+  font-family: Consolas, monaco, monospace;
+  font-size: 12px;
+  margin: 8px 8px 0px 8px;
 }
