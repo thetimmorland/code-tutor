@@ -53,8 +53,10 @@ export default function App() {
   }
 
   function stopSketch() {
-    setIsRunning(false);
-    setLog((log) => [...log, "Sketch Stopped"]);
+    if (isRunning) {
+      setIsRunning(false);
+      setLog((log) => [...log, "Sketch Stopped"]);
+    }
   }
 
   return (
