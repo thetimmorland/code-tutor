@@ -1,12 +1,22 @@
 import React, { forwardRef } from "react";
 
-const errorHijacker = `
-    // catch reference errors, via http://stackoverflow.com/a/12747364/2994108
-    window.onerror = function (msg, url, lineNumber, columnNo, error) {
-        window.parent.postMessage({error: {msg, lineNumber, columnNo}}, '*');
-      return false;
-    };
-  `;
+const bridgeScript = `
+  window.onerror = function (text, url, row, column, error) {
+    const payload = row + ":" + column + " " + text;
+    window.parent.postMessage({ source: "code-tutor-bridge", payload}, '*');
+    return true;
+  };
+
+  var console = {
+    log: function () {
+      let payload = [];
+      for (var i = 0, n = arguments.length; i < n; i++) {
+        payload.push(arguments[i]);
+      }
+      window.parent.postMessage({ source: "code-tutor-bridge", payload }, '*');
+    }
+  };
+  `.replace(/\n/g, "");
 
 const Sketch = forwardRef((props, ref) => {
   const parser = new DOMParser();
@@ -25,13 +35,13 @@ const Sketch = forwardRef((props, ref) => {
   p5.src = "https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js";
   srcDoc.head.appendChild(p5);
 
+  const bridge = srcDoc.createElement("script");
+  bridge.innerHTML = bridgeScript;
+  srcDoc.head.appendChild(bridge);
+
   const code = srcDoc.createElement("script");
   code.innerHTML = props.value;
   srcDoc.head.appendChild(code);
-
-  const onError = srcDoc.createElement("script");
-  onError.innerHTML = errorHijacker;
-  srcDoc.head.appendChild(onError);
 
   return (
     <iframe
@@ -43,6 +53,6 @@ const Sketch = forwardRef((props, ref) => {
       sandbox="allow-scripts allow-pointer-lock allow-same-origin allow-popups allow-forms allow-modals"
     />
   );
-})
+});
 
 export default Sketch;

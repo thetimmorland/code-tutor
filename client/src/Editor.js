@@ -10,8 +10,11 @@ export default function Editor(props) {
     <AceEditor
       mode="javascript"
       theme="github"
+      focus={true}
       value={props.value}
+      tabSize={2}
       onChange={props.onChange}
+      annotations={[]}
       width="100%"
       height="100%"
     />

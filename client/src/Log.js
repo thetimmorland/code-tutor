@@ -1,11 +1,23 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 export default function Log(props) {
+  const log = props.value || [];
+  var logEnd = useRef(null);
+
+  useEffect(() => {
+    logEnd.scrollIntoView();
+  });
+
   return (
     <div className={props.className}>
-      {(props.value || []).map((entry, idx) => (
-        <p key={idx}>{`${entry.lineNumber}:${entry.columnNo} ${entry.msg}`}</p>
+      {log.map((entry, idx) => (
+        <p key={idx}>{entry}</p>
       ))}
+      <div
+        ref={(el) => {
+          logEnd = el;
+        }}
+      />
     </div>
   );
 }
