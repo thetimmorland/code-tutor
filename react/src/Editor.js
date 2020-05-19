@@ -6,15 +6,17 @@ import "ace-builds/src-noconflict/theme-github";
 import "ace-builds/webpack-resolver.js";
 
 export default function Editor(props) {
+  const handleChange = (newValue) => {
+    props.socket.send(newValue);
+  };
+
   return (
     <AceEditor
       mode="javascript"
       theme="github"
       value={props.value}
       tabSize={2}
-      onChange={(newValue) =>
-        props.dispatch({ type: "setEditor", value: newValue })
-      }
+      onChange={handleChange}
       annotations={[]}
       width="100%"
       height="100%"

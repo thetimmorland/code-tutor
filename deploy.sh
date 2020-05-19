@@ -5,7 +5,7 @@ project_root="${BASH_SOURCE%/*}"
 cd $project_root
 
 printf "Deploying client to github Pages\n"
-npm run deploy --prefix client
+npm run deploy --prefix react
 
 printf "Deploying server to Heroku\n"
 git subtree push --prefix server heroku master

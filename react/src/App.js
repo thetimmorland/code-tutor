@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React, { useReducer, useEffect } from "react";
 import ReconnectingWebSocket from "reconnecting-websocket";
 
 import Sketch from "./Sketch";
@@ -7,22 +7,23 @@ import Log from "./Log";
 
 import "./App.css";
 
+const socket = new ReconnectingWebSocket(
+  process.env.NODE_ENV === "production"
+    ? `wss://tim-code-tutor.herokuapp.com`
+    : `ws://localhost:8080`
+);
+
 const initialState = {
-  editor: "",
+  socket: null,
   sketch: "",
+  editor: "",
   log: [],
 };
 
-const socket = new ReconnectingWebSocket(
-  process.env.NODE_ENV === "production"
-    ? "ws://tim-code-tutor.herokuapp.com/socket"
-    : "ws://localhost:8080/socket"
-);
-
 function reducer(state, action) {
+  console.log(action);
   switch (action.type) {
     case "startSketch":
-      socket.send("bruh");
       return { ...state, sketch: state.editor, log: ["Starting Sketch..."] };
 
     case "stopSketch":
@@ -33,13 +34,10 @@ function reducer(state, action) {
       };
 
     case "setEditor":
-      return {
-        ...state,
-        editor: action.value,
-      };
+      return { ...state, editor: action.value };
 
-    case "log":
-      return { ...state, log: [...state.log, action.message] };
+    case "appendLog":
+      return { ...state, log: [...state.log, action.value] };
 
     default:
       throw new Error();
@@ -48,6 +46,12 @@ function reducer(state, action) {
 
 export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  useEffect(() => {
+    socket.onmessage = (msg) => {
+      dispatch({ type: "setEditor", value: msg.data });
+    };
+  }, []);
 
   return (
     <div className="App">
@@ -66,7 +70,7 @@ export default function App() {
             {"\u25A0"}
           </button>
         </div>
-        <Editor value={state.editor} dispatch={dispatch} />
+        <Editor value={state.editor} socket={socket} />
         <Log className="Log" value={state.log} />
       </div>
       <div className="Column">

@@ -1,24 +1,17 @@
-const express = require("express");
-const expressWs = require("express-ws");
+var WebSocket = require("ws");
+const port = process.env.port || 8080;
 
-const app = express();
-expressWs(app);
+var wss = new WebSocket.Server({ port });
 
-app.ws("/socket", (ws, req) => {
-  ws.on("open", () => {
-    ws.send("Hello World!");
-  });
+let doc = "hello";
+
+wss.on("connection", (ws, req) => {
+  ws.send(doc);
 
   ws.on("message", (msg) => {
-    console.log(msg);
-  });
-
-  ws.on("close", () => {
-    console.log("goodbye");
+    doc = msg;
+    wss.clients.forEach((client) => client.send(doc));
   });
 });
 
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-  console.log("Listening on port " + PORT);
-});
+console.log("Listening on port", port);
