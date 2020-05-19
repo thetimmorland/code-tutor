@@ -1,20 +1,26 @@
-var http = require("http");
-var express = require("express");
-const ShareDB = require("sharedb");
-var WebSocket = require("ws");
-var WebSocketJSONStream = require("@teamwork/websocket-json-stream");
+const express = require("express");
+const expressWs = require("express-ws");
 
-const backend = new ShareDB({ presence: true });
+const app = express();
+expressWs(app);
 
-var app = express();
-var server = http.createServer(app);
+app.use(express.static("static"));
 
-// Connect any incoming WebSocket connection to ShareDB
-var wss = new WebSocket.Server({ server: server });
-wss.on("connection", function (ws) {
-  var stream = new WebSocketJSONStream(ws);
-  backend.listen(stream);
+app.ws("/api/socket", (ws, req) => {
+  ws.on("open", () => {
+    ws.send("Hello World!");
+  });
+
+  ws.on("message", (msg) => {
+    console.log(msg);
+  });
+
+  ws.on("close", () => {
+    console.log("goodbye");
+  });
 });
 
-server.listen(8080);
-console.log("Listening on http://localhost:8080");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log("Listening on port " + PORT);
+});
