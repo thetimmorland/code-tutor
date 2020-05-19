@@ -13,7 +13,11 @@ const initialState = {
   log: [],
 };
 
-const socket = new ReconnectingWebSocket(`ws://localhost:8080/api/socket`);
+const socket = new ReconnectingWebSocket(
+  process.env.NODE_ENV === "production"
+    ? "ws://tim-code-tutor.herokuapp.com/socket"
+    : "ws://localhost:8080/socket"
+);
 
 function reducer(state, action) {
   switch (action.type) {

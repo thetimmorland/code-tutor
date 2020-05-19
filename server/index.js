@@ -4,9 +4,7 @@ const expressWs = require("express-ws");
 const app = express();
 expressWs(app);
 
-app.use(express.static("static"));
-
-app.ws("/api/socket", (ws, req) => {
+app.ws("/socket", (ws, req) => {
   ws.on("open", () => {
     ws.send("Hello World!");
   });
