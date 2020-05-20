@@ -15,36 +15,55 @@ const socket = new socketIO(
     : `localhost:8080`
 );
 
-export default function Editor(props) {
-  const code = useRef(props.code);
+export default function Editor({ code, setCode }) {
+  const codeRef = useRef(code);
 
   useEffect(() => {
-    socket.on("change", []);
-  });
-
-  useEffect(() => {
-    code.current = props.code;
-  }, [props]);
+    codeRef.current = code;
+  }, [code]);
 
   useEffect(() => {
     socket.on("sync", (newCode) => {
-      props.setCode((code) => ({ ...code, editor: newCode }));
+      setCode((code) => ({ ...code, editor: newCode }));
     });
 
-    socket.on("insert", ([offset, value]) => {});
+    socket.on("insert", ({ offset, value }) => {
+      console.log(offset, value);
+      setCode((code) => {
+        try {
+          const front = code.editor.slice(0, offset);
+          const back = code.editor.slice(offset);
+          return { ...code, editor: front + value + back };
+        } catch (err) {
+          console.log(err);
+          return code;
+        }
+      });
+    });
 
-    socket.on("remove", ([offset, value]) => {});
-  });
+    socket.on("remove", ({ offset, count, value }) => {
+      setCode((code) => {
+        try {
+          const front = code.editor.slice(0, offset);
+          const back = code.editor.slice(offset + count);
+          return { ...code, editor: front + back };
+        } catch (err) {
+          console.log(err);
+          return code;
+        }
+      });
+    });
+  }, [setCode]);
 
   const handleChange = (newCode) => {
-    const diff = diffChars(code.current, newCode);
+    const diff = diffChars(codeRef.current, newCode);
 
     let offset = 0;
     diff.forEach(({ count, value, added, removed }) => {
       if (added) {
-        socket.emit("insert", [offset, value]);
+        socket.emit("insert", { offset, value });
       } else if (removed) {
-        socket.emit("remove", [offset, value]);
+        socket.emit("remove", { offset, count, value });
       }
 
       if (!removed) {
@@ -52,16 +71,15 @@ export default function Editor(props) {
       }
     });
 
-    props.setCode((code) => ({ ...code, editor: newCode }));
+    setCode((code) => ({ ...code, editor: newCode }));
   };
 
   return (
     <AceEditor
       mode="javascript"
       theme="github"
-      value={props.code}
+      value={code}
       tabSize={2}
-      debounceChangePeriod={500}
       onChange={handleChange}
       annotations={[]}
       width="100%"

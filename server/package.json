@@ -4,9 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "lint": "eslint",
-    "dev": "nodemon --exec 'npm run lint && npm start'",
+    "start": "tsc && node ./dist/server.js",
+    "dev": "ts-node-dev --respawn --transpileOnly src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,11 +19,17 @@
   },
   "homepage": "https://github.com/thetimmorland/code-tutor#readme",
   "dependencies": {
+    "@types/express": "^4.17.6",
+    "@types/node": "^14.0.4",
+    "@types/socket.io": "^2.1.6",
     "express": "^4.17.1",
-    "socket.io": "^2.3.0"
+    "jumprope": "^1.2.1",
+    "socket.io": "^2.3.0",
+    "typescript": "^3.9.3",
+    "uuid-validate": "0.0.3"
   },
   "devDependencies": {
-    "eslint": "^7.0.0",
-    "nodemon": "^2.0.4"
+    "ts-node-dev": "^1.0.0-pre.44",
+    "tslint": "^6.1.2"
   }
 }
