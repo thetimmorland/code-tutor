@@ -20,7 +20,8 @@
   },
   "homepage": "https://github.com/thetimmorland/code-tutor#readme",
   "dependencies": {
-    "ws": "^7.3.0"
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0"
   },
   "devDependencies": {
     "eslint": "^7.0.0",
