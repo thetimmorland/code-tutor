@@ -1,11 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 
-export default function Log(props) {
-  const log = props.value || [];
-
+export default function Log({ value }) {
   return (
-    <div className={props.className}>
-      {log.map((entry, idx) => (
+    <div className="Log">
+      {(value || []).map((entry, idx) => (
         <pre key={idx}>{entry}</pre>
       ))}
       <div />

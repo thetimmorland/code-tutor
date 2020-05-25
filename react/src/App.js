@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
+import useShareDB from "./useShareDB.js";
 
 import Sketch from "./Sketch";
 import Editor from "./Editor";
@@ -7,18 +9,31 @@ import Log from "./Log";
 import "./App.css";
 
 export default function App() {
-  const [code, setCode] = useState({ editor: "", sketch: "" });
+  const [code, handleChange] = useShareDB("0");
+  const codeRef = useRef(null);
+
+  useEffect(() => {
+    codeRef.current = code;
+  }, [code]);
+
+  const [sketch, setSketch] = useState("");
   const [log, setLog] = useState([]);
 
   const startSketch = () => {
-    setCode((code) => ({ ...code, sketch: code.editor }));
-    setLog(["Starting Sketch...."]);
+    setSketch(codeRef.current);
   };
 
   const stopSketch = () => {
-    setCode((code) => ({ ...code, sketch: "" }));
-    setLog((log) => [...log, "Stopping Sketch..."]);
+    setSketch("");
   };
+
+  useEffect(() => {
+    if (sketch) {
+      setLog(["Starting Sketch..."]);
+    } else {
+      setLog((log) => [...log, "Sketch Stopped."]);
+    }
+  }, [sketch]);
 
   return (
     <div className="App">
@@ -31,11 +46,11 @@ export default function App() {
             {"\u25A0"}
           </button>
         </div>
-        <Editor code={code.editor} setCode={setCode} />
-        <Log className="Log" value={log} />
+        <Editor value={code} handleChange={handleChange} />
+        <Log value={log} />
       </div>
       <div className="Column">
-        <Sketch code={code.sketch} setLog={setLog} />
+        <Sketch value={sketch} setLog={setLog} />
       </div>
     </div>
   );

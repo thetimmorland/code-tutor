@@ -1,45 +1,15 @@
-const { Duplex } = require("stream");
-const browserChannel = require("browserchannel").server;
-const connect = require("connect");
-const livedb = require("livedb");
-const sharejs = require("share");
+const port = process.env.PORT || 8080;
 
-const backend = livedb.client(livedb.memory());
-const share = sharejs.server.createClient({ backend });
+const WebSocket = require("ws");
+const WebSocketJSONStream = require("@teamwork/websocket-json-stream");
+const ShareDB = require("sharedb");
 
-const webserver = connect();
+const server = new WebSocket.Server({ port });
+const share = new ShareDB();
 
-webserver.use(
-  browserChannel({ webserver, sessionTimoutInterval: 5000 }, (client) => {
-    var stream = new Duplex({ objectMode: true });
-
-    stream._read = () => {};
-    stream._write = (chunk, encoding, callback) => {
-      if (client.state !== "closed") {
-        client.send(chunk);
-      }
-      callback();
-    };
-
-    client.on("message", (data) => {
-      stream.push(data);
-    });
-
-    client.on("close", (reason) => {
-      stream.push(null);
-      stream.emit("close");
-    });
-
-    stream.on("end", () => {
-      client.close();
-    });
-
-    // Give the stream to sharejs
-    return share.listen(stream);
-  })
-);
-
-const PORT = process.env.PORT || 8080;
-webserver.listen(PORT, () => {
-  console.log(`Listening on port: ${PORT}`);
+server.on("connection", (ws) => {
+  const stream = new WebSocketJSONStream(ws);
+  share.listen(stream);
 });
+
+console.log("listening on port: " + port);

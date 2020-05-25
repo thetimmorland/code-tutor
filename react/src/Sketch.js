@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 const bridgeScript = `
   window.onerror = function (text, url, row, column, error) {
@@ -8,20 +8,17 @@ const bridgeScript = `
   };
 
   var console = {
-    log: function () {
-      let payload = [];
-      for (var i = 0, n = arguments.length; i < n; i++) {
-        payload.push(arguments[i]);
-      }
+    log: function (payload) {
       window.parent.postMessage({ source: "code-tutor-bridge", payload }, '*');
     }
   };
   `.replace(/\n/g, "");
 
-export default function Sketch(props) {
+export default function Sketch({ value, setLog }) {
   window.addEventListener("message", (message) => {
     if (message.data.source === "code-tutor-bridge") {
-      props.dispatch({ type: "log", message: message.data.payload });
+      console.log(message);
+      setLog((log) => [...log, message.data.payload]);
     }
   });
 
@@ -46,7 +43,7 @@ export default function Sketch(props) {
   srcDoc.head.appendChild(bridge);
 
   const sketch = srcDoc.createElement("script");
-  sketch.innerHTML = props.value;
+  sketch.innerHTML = value;
   srcDoc.head.appendChild(sketch);
 
   return (
