@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
+    "start": "node src/server/index.js",
     "build": "webpack --mode production",
     "client": "webpack-dev-server --mode development",
     "server": "nodemon src/server/index.js",
-    "start": "concurrently npm:client npm:server"
+    "dev": "concurrently npm:client npm:server"
   },
   "repository": {
     "type": "git",
