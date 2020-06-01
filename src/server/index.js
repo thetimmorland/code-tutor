@@ -22,12 +22,12 @@ const app = express();
 const expressWs = require("express-ws")(app);
 const share = new ShareDb({ db });
 
+app.use(express.static("dist"));
+
 expressWs.getWss().on("connection", (ws) => {
   const stream = new WebSocketJSONStream(ws);
   share.listen(stream);
 });
-
-app.ws("/sharedb", (ws, req) => {});
 
 app.get("/api/createSketch", (req, res) => {
   const connection = share.connect();
