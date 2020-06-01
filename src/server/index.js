@@ -29,6 +29,8 @@ expressWs.getWss().on("connection", (ws) => {
   share.listen(stream);
 });
 
+app.ws("/socket", () => {})
+
 app.get("/api/createSketch", (req, res) => {
   const connection = share.connect();
   const id = uuid.v4();
@@ -36,7 +38,7 @@ app.get("/api/createSketch", (req, res) => {
 
   doc.fetch((err) => {
     if (err) throw err;
-    doc.create({ code: 'console.log("hello world")' }, (err) => {
+    doc.create({ code: `console.log("hello world")` }, (err) => {
       if (err) throw err;
       res.send(id);
     });

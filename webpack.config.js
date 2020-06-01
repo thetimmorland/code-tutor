@@ -1,42 +1,47 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const outputDirectory = 'dist';
+const outputDirectory = "dist";
 
 module.exports = {
   stats: "errors-warnings",
-  entry: ['babel-polyfill', './src/client/index.js'],
+  entry: ["babel-polyfill", "./src/client/index.js"],
   output: {
     path: path.join(__dirname, outputDirectory),
-    filename: 'bundle.js'
+    filename: "bundle.js",
   },
   module: {
-    rules: [{
+    rules: [
+      {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
-        }
+          loader: "babel-loader",
+        },
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ["style-loader", "css-loader"],
       },
-    ]
+    ],
   },
   resolve: {
-    extensions: ['*', '.js', '.jsx']
+    extensions: ["*", ".js", ".jsx"],
   },
   devServer: {
     open: true,
     historyApiFallback: true,
     proxy: {
-      '/api': 'http://localhost:3000'
-    }
+      "/api": "http://localhost:3000",
+      "/socket": {
+        ws: true,
+        target: "ws://localhost:3000",
+      },
+    },
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/client/index.html',
-    })
-  ]
+      template: "./src/client/index.html",
+    }),
+  ],
 };
