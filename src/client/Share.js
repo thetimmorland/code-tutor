@@ -11,7 +11,7 @@ import ShareDB from "sharedb/lib/client";
 import { useParams, Redirect } from "react-router-dom";
 
 const socket = new WebSocket(
-  `${window.location.protocol === "https" ? "wss" : "ws"}://${
+  `${window.location.protocol === "http:" ? "ws" : "wss"}://${
     window.location.host
   }/socket`
 );
