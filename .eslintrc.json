@@ -1,11 +1,12 @@
 {
+  "plugins": ["react"],
+  "extends": ["eslint:recommended", "plugin:react/recommended"],
   "parser": "babel-eslint",
-  "extends": ["airnbnb"],
   "env": {
     "browser": true,
     "node": true
   },
   "rules": {
-    "react/jsx-filename-extension": "off"
+    "react/prop-types": "off"
   }
 }
