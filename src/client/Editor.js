@@ -16,21 +16,15 @@ export default function Editor() {
     codeRef.current = value.code;
   }, [value]);
 
-  const handleChange = (newCode) => {
-    const diff = diffChars(codeRef.current, newCode);
+  const handleChange = (newValue) => {
+    const diff = diffChars(codeRef.current, newValue);
 
     let offset = 0;
     diff.forEach(({ count, value, added, removed }) => {
       if (added) {
-        submitOp(
-          { ...value, code: newCode },
-          { p: ["code", offset], si: value }
-        );
+        submitOp({ p: ["code", offset], si: value });
       } else if (removed) {
-        submitOp(
-          { ...value, code: newCode },
-          { p: ["code", offset], sd: value }
-        );
+        submitOp({ p: ["code", offset], sd: value });
       }
 
       if (!removed) offset += count;

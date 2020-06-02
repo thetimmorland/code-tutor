@@ -11,9 +11,9 @@ import ShareDB from "sharedb/lib/client";
 import { useParams, Redirect } from "react-router-dom";
 
 const socket = new WebSocket(
-  `${window.location.protocol === "http:" ? "ws" : "wss"}://${
-    window.location.host
-  }/socket`
+  (window.location.protocol === "http:" ? "ws://" : "wss://") +
+    window.location.host +
+    "/socket"
 );
 
 const connection = new ShareDB.Connection(socket);
@@ -26,46 +26,36 @@ export function useShare() {
 
 export default function Share({ children }) {
   const { id } = useParams();
-
-  const [docExists, setDocExists] = useState(true);
   const [value, setValue] = useState({ code: "" });
-
   const docRef = useRef(null);
 
   useEffect(() => {
-    if (id) {
-      const document = connection.get("collection", id);
+    docRef.current = connection.get("collection", id);
 
-      document.subscribe((err) => {
-        if (err) console.log(err);
+    docRef.current.subscribe((err) => {
+      if (err) throw err;
 
-        if (document.type === null) {
-          // if document does not exist
-          setDocExists(false);
-        } else {
-          docRef.current = document;
-          setValue(document.data);
-        }
+      setValue({ ...docRef.current.data });
+
+      docRef.current.on("op", () => {
+        setValue({ ...docRef.current.data });
       });
+    });
 
-      document.on("op", (op, source) => {
-        setValue(document.data);
-      });
-
-      return () => {
-        document.destroy();
-      };
-    }
+    return () => {
+      docRef.current.destroy();
+    };
   }, [id]);
 
-  const submitOp = (newValue, op) => {
-    if (docRef.current) {
-      docRef.current.submitOp(op);
-      setValue(newValue);
-    }
+  useEffect(() => {
+    console.log(value);
+  }, [value]);
+
+  const submitOp = (op) => {
+    docRef.current.submitOp(op);
   };
 
-  if (!docExists) {
+  if (docRef.current && !docRef.current.type) {
     return <Redirect to="/" />;
   }
 
