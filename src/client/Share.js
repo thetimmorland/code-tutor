@@ -47,10 +47,6 @@ export default function Share({ children }) {
     };
   }, [id]);
 
-  useEffect(() => {
-    console.log(value);
-  }, [value]);
-
   const submitOp = (op) => {
     docRef.current.submitOp(op);
   };
