@@ -70,7 +70,7 @@ export default function Ide() {
     <div className={classes.root}>
       <AppBar>
         <Toolbar className={classes.toolbar}>
-          <IconButton color="inherit" onClick={startSketch}>
+          <IconButton edge="start" color="inherit" onClick={startSketch}>
             <PlayArrow />
           </IconButton>
           <IconButton color="inherit" onClick={stopSketch}>

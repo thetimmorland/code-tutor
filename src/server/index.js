@@ -7,6 +7,15 @@ const ShareDb = require("sharedb");
 const uuid = require("uuid");
 const shareDbMongo = require("sharedb-mongo");
 
+const codeTemplate = `function setup() {
+  createCanvas(windowWidth, windowHeight);
+}
+
+function draw() {
+  background(220);
+  circle(mouseX, mouseY, 50);
+}`;
+
 ShareDb.logger.setMethods({
   info: () => console.log(),
   warn: () => console.log(),
@@ -29,7 +38,7 @@ expressWs.getWss().on("connection", (ws) => {
   share.listen(stream);
 });
 
-app.ws("/socket", () => {})
+app.ws("/socket", () => {});
 
 app.get("/api/createSketch", (req, res) => {
   const connection = share.connect();
@@ -38,7 +47,7 @@ app.get("/api/createSketch", (req, res) => {
 
   doc.fetch((err) => {
     if (err) throw err;
-    doc.create({ code: `console.log("hello world")` }, (err) => {
+    doc.create({ code: codeTemplate }, (err) => {
       if (err) throw err;
       res.send(id);
     });

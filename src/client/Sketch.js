@@ -63,14 +63,12 @@ export default function Sketch({ value, setLog }) {
   srcDoc.head.appendChild(sketch);
 
   return (
-    <div style={{ flexGrow: 1 }}>
-      <iframe
-        title="sketch"
-        srcDoc={srcDoc.documentElement.outerHTML}
-        frameBorder={0}
-        style={{ width: "100%", height: "100%" }}
-        sandbox="allow-scripts allow-pointer-lock allow-same-origin allow-popups allow-forms allow-modals"
-      />
-    </div>
+    <iframe
+      title="sketch"
+      srcDoc={srcDoc.documentElement.outerHTML}
+      frameBorder={0}
+      style={{ width: "100%", height: "100%" }}
+      sandbox="allow-scripts allow-pointer-lock allow-same-origin allow-popups allow-forms allow-modals"
+    />
   );
 }
