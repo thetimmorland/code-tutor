@@ -48,6 +48,7 @@ export default function Share({ children }) {
   }, [id]);
 
   const submitOp = (op) => {
+    console.log(op);
     docRef.current.submitOp(op);
   };
 
@@ -56,8 +57,10 @@ export default function Share({ children }) {
   }
 
   return (
-    <ShareContext.Provider value={{ value, submitOp }}>
-      {children}
-    </ShareContext.Provider>
+    docRef.current && (
+      <ShareContext.Provider value={{ value, submitOp }}>
+        {children}
+      </ShareContext.Provider>
+    )
   );
 }

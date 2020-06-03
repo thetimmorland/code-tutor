@@ -18,7 +18,8 @@ export default function Editor() {
   }, [value]);
 
   const handleChange = (newValue) => {
-    const diff = diffChars(codeRef.current, newValue);
+    console.log(newValue);
+    const diff = diffChars(codeRef.current, newValue.replace(/\r\n/g, "\n"));
 
     let offset = 0;
     diff.forEach(({ count, value, added, removed }) => {
@@ -36,9 +37,11 @@ export default function Editor() {
     <AceEditor
       mode="javascript"
       theme="github"
-      value={code || ""}
+      defaultValue={code}
+      value={code}
       tabSize={2}
       onChange={handleChange}
+      debounceChangePeriod={50}
       annotations={[]}
       width="100%"
       height="100%"
