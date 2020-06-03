@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { makeStyles } from "@material-ui/core/styles";
+import { List, ListItem, ListItemText } from "@material-ui/core";
+
+const useStyles = makeStyles((theme) => ({
+  list: {
+    height: "100%",
+    overflow: "auto",
+  },
+  text: {
+    fontFamily: "monospace",
+    whiteSpace: "pre-line",
+  },
+}));
+
 export default function Log({ value }) {
+  const classes = useStyles();
   const [atBottom, setAtBottom] = useState(true);
   const logRef = useRef(null);
 
@@ -18,11 +33,15 @@ export default function Log({ value }) {
   };
 
   return (
-    <div className="Log" ref={logRef} onScroll={handleScroll}>
+    <List className={classes.list} ref={logRef} onScroll={handleScroll}>
       {(value || []).map((entry, idx) => (
-        <pre key={idx}>{entry}</pre>
+        <ListItem dense divider key={idx}>
+          <ListItemText
+            primaryTypographyProps={{ className: classes.text }}
+            primary={entry}
+          />
+        </ListItem>
       ))}
-      <div />
-    </div>
+    </List>
   );
 }

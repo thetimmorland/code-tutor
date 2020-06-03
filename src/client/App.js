@@ -1,23 +1,27 @@
-import React from 'react';
-import { HashRouter as Router, Switch, Route } from 'react-router-dom';
+import React from "react";
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { CssBaseline } from "@material-ui/core";
 
-import Share from './Share';
-import CreateSketch from './CreateSketch';
-import Ide from './Ide';
+import Share from "./Share";
+import CreateSketch from "./CreateSketch";
+import Ide from "./Ide";
 
 export default function App() {
   return (
-    <Router>
-      <Switch>
-        <Route exact path="/">
-          <CreateSketch />
-        </Route>
-        <Route path="/:id">
-          <Share>
-            <Ide />
-          </Share>
-        </Route>
-      </Switch>
-    </Router>
+    <>
+      <CssBaseline />
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <CreateSketch />
+          </Route>
+          <Route path="/:id">
+            <Share>
+              <Ide />
+            </Share>
+          </Route>
+        </Switch>
+      </Router>
+    </>
   );
 }

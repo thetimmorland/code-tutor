@@ -1,16 +1,46 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { AppBar, Toolbar, IconButton, Grid, Paper } from "@material-ui/core";
+
+import { PlayArrow, Stop } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/core/styles";
+
 import { useShare } from "./Share";
 
 import Sketch from "./Sketch";
 import Editor from "./Editor";
 import Log from "./Log";
 
-import "./App.css";
+const useStyles = makeStyles((theme) => ({
+  root: {
+    display: "flex",
+    height: "100vh",
+  },
+  main: {
+    display: "flex",
+    flexGrow: 1,
+    flexDirection: "column",
+  },
+  appBarSpacer: {
+    flexGrow: 0,
+    flexShrink: 0,
+    ...theme.mixins.toolbar,
+  },
+  content: {
+    display: "flex",
+    flexGrow: 1,
+    padding: theme.spacing(2),
+  },
+  paper: {
+    height: "100%",
+    padding: theme.spacing(2),
+  },
+}));
 
 export default function Ide() {
-  const { value } = useShare();
-  const code = value ? value.code : null;
+  const classes = useStyles();
+  const { value } = useShare() || {};
+  const { code } = value || {};
   const codeRef = useRef(null);
 
   useEffect(() => {
@@ -37,22 +67,41 @@ export default function Ide() {
   }, [sketch]);
 
   return (
-    <div className="App">
-      <div className="Column">
-        <div className="ButtonBar">
-          <button className="StartButton" onClick={startSketch}>
-            {"\u25B6"}
-          </button>
-          <button className="StopButton" onClick={stopSketch}>
-            {"\u25A0"}
-          </button>
+    <div className={classes.root}>
+      <AppBar>
+        <Toolbar className={classes.toolbar}>
+          <IconButton color="inherit" onClick={startSketch}>
+            <PlayArrow />
+          </IconButton>
+          <IconButton color="inherit" onClick={stopSketch}>
+            <Stop />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      <main className={classes.main}>
+        <div className={classes.appBarSpacer} />
+        <div className={classes.content}>
+          <Grid container spacing={2}>
+            <Grid item xs={6} container direction="column" spacing={2}>
+              <Grid item style={{ height: "75%" }}>
+                <Paper className={classes.paper} variant="outlined">
+                  <Editor />
+                </Paper>
+              </Grid>
+              <Grid item style={{ height: "25%" }}>
+                <Paper className={classes.paper} variant="outlined">
+                  <Log value={log} />
+                </Paper>
+              </Grid>
+            </Grid>
+            <Grid item xs={6}>
+              <Paper className={classes.paper} variant="outlined">
+                <Sketch value={sketch} setLog={setLog} />
+              </Paper>
+            </Grid>
+          </Grid>
         </div>
-        <Editor />
-        <Log value={log} />
-      </div>
-      <div className="Column">
-        <Sketch value={sketch} setLog={setLog} />
-      </div>
+      </main>
     </div>
   );
 }

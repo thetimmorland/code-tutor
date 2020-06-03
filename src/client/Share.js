@@ -26,7 +26,7 @@ export function useShare() {
 
 export default function Share({ children }) {
   const { id } = useParams();
-  const [value, setValue] = useState({ code: "" });
+  const [value, setValue] = useState();
   const docRef = useRef(null);
 
   useEffect(() => {

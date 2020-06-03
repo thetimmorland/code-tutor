@@ -10,10 +10,11 @@ import { useShare } from "./Share";
 
 export default function Editor() {
   const { value, submitOp } = useShare();
+  const { code } = value || {};
   const codeRef = useRef(null);
 
   useEffect(() => {
-    codeRef.current = value.code;
+    codeRef.current = code;
   }, [value]);
 
   const handleChange = (newValue) => {
@@ -35,7 +36,7 @@ export default function Editor() {
     <AceEditor
       mode="javascript"
       theme="github"
-      value={value.code}
+      value={code || ""}
       tabSize={2}
       onChange={handleChange}
       annotations={[]}
