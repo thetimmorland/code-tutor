@@ -1,6 +1,7 @@
 const port = process.env.PORT || 8080;
 
-const app = require("express")();
+const express = require("express");
+const app = express();
 const expressWs = require("express-ws")(app);
 
 const uuid = require("uuid");
