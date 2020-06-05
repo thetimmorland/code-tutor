@@ -12,7 +12,7 @@ import { useParams, Redirect } from "react-router-dom";
 
 const socket = new WebSocket(
   (window.location.protocol === "https:" ? "wss://" : "ws://") +
-    (process.env.NODE_ENV == "production"
+    (process.env.NODE_ENV === "production"
       ? window.location.host
       : "localhost:8080") +
     "/websocket"

@@ -19,9 +19,9 @@ const useStyles = makeStyles((theme) => ({
   main: {
     flexGrow: 1,
     display: "flex",
+    flexDirection: "column",
   },
   appBarSpacer: {
-    flexGrow: 0,
     flexShrink: 0,
     ...theme.mixins.toolbar,
   },
@@ -29,21 +29,18 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
     display: "flex",
   },
-  leftColumn: {
-    flexGrow: 0.5,
-    display: "flex",
-    flexDirection: "column",
-  },
-  rightColumn: {
-    flexGrow: 0.5,
-    display: "flex",
-    flexDirection: "column",
+  column: {
+    float: "left",
+    width: "50%",
+    margin: theme.spacing(2),
   },
   editorContainer: {
-    flexGrow: 0.8,
+    height: "80%",
+    marginTop: theme.spacing(2),
+    marginLeft: theme.spacing(2),
   },
   logContainer: {
-    flexGrow: 0.2,
+    height: "20%",
   },
   paper: {
     height: "100%",
@@ -94,7 +91,7 @@ export default function Ide() {
       <main className={classes.main}>
         <div className={classes.appBarSpacer} />
         <div className={classes.content}>
-          <div className={classes.leftColumn}>
+          <div className={classes.column}>
             <div className={classes.editorContainer}>
               <Paper className={classes.paper} variant="outlined">
                 <Editor />
@@ -106,7 +103,7 @@ export default function Ide() {
               </Paper>
             </div>
           </div>
-          <div className={classes.rightColumn}>
+          <div className={classes.column}>
             <Paper className={classes.paper} variant="outlined">
               <Sketch value={sketch} setLog={setLog} />
             </Paper>
