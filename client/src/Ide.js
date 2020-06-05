@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { AppBar, Toolbar, IconButton, Grid, Paper } from "@material-ui/core";
+import { AppBar, Toolbar, IconButton, Paper } from "@material-ui/core";
 
-import { PlayArrow, Stop } from "@material-ui/icons";
-import { makeStyles } from "@material-ui/core/styles";
+import { PlayArrow, Stop, CallReceived } from "@material-ui/icons";
 
 import { useShare } from "./Share";
 
@@ -11,39 +10,37 @@ import Sketch from "./Sketch";
 import Editor from "./Editor";
 import Log from "./Log";
 
+import { makeStyles } from "@material-ui/core/styles";
+
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    flexDirection: "column",
     height: "100vh",
+  },
+  appBarSpacer: {
+    ...theme.mixins.toolbar,
   },
   main: {
     flexGrow: 1,
     display: "flex",
-    flexDirection: "column",
-  },
-  appBarSpacer: {
-    flexShrink: 0,
-    ...theme.mixins.toolbar,
+    marginBottom: theme.spacing(1),
+    marginRight: theme.spacing(1),
   },
   content: {
-    flexGrow: 1,
     display: "flex",
+    flexGrow: 1,
+    flexBasis: "auto",
   },
   column: {
-    float: "left",
-    width: "50%",
-    margin: theme.spacing(2),
-  },
-  editorContainer: {
-    height: "80%",
-    marginTop: theme.spacing(2),
-    marginLeft: theme.spacing(2),
-  },
-  logContainer: {
-    height: "20%",
+    flexGrow: 1,
+    display: "flex",
+    flexDirection: "column",
   },
   paper: {
-    height: "100%",
+    marginLeft: theme.spacing(1),
+    marginTop: theme.spacing(1),
+    padding: theme.spacing(1),
   },
 }));
 
@@ -88,26 +85,30 @@ export default function Ide() {
           </IconButton>
         </Toolbar>
       </AppBar>
+      <div className={classes.appBarSpacer} />
       <main className={classes.main}>
-        <div className={classes.appBarSpacer} />
-        <div className={classes.content}>
-          <div className={classes.column}>
-            <div className={classes.editorContainer}>
-              <Paper className={classes.paper} variant="outlined">
-                <Editor />
-              </Paper>
-            </div>
-            <div className={classes.logContainer}>
-              <Paper className={classes.paper} variant="outlined">
-                <Log value={log} />
-              </Paper>
-            </div>
-          </div>
-          <div className={classes.column}>
-            <Paper className={classes.paper} variant="outlined">
-              <Sketch value={sketch} setLog={setLog} />
-            </Paper>
-          </div>
+        <div className={classes.column}>
+          <Paper
+            className={classes.paper}
+            style={{ flexGrow: 1 }}
+            variant="outlined"
+            square
+          >
+            <Editor />
+          </Paper>
+          <Paper className={classes.paper} variant="outlined" square>
+            <Log value={log} />
+          </Paper>
+        </div>
+        <div className={classes.column}>
+          <Paper
+            className={classes.paper}
+            style={{ flexGrow: 1 }}
+            variant="outlined"
+            square
+          >
+            <Sketch value={sketch} setLog={setLog} />
+          </Paper>
         </div>
       </main>
     </div>

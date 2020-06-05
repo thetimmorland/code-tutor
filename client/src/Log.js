@@ -1,15 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 
+import { ListItem, ListItemText } from "@material-ui/core";
+
 import { makeStyles } from "@material-ui/core/styles";
-import { List, ListItem, ListItemText } from "@material-ui/core";
+
+import { FixedSizeList } from "react-window";
 
 const useStyles = makeStyles((theme) => ({
-  list: {
-    height: "100%",
-    width: "100%",
-    overflow: "auto",
-  },
-  text: {
+  primary: {
     fontFamily: "monospace",
     whiteSpace: "pre-line",
   },
@@ -17,32 +15,17 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Log({ value }) {
   const classes = useStyles();
-  const [atBottom, setAtBottom] = useState(true);
-  const logRef = useRef(null);
-
-  useEffect(() => {
-    if (logRef.current) {
-      if (atBottom) {
-        logRef.current.scrollTop = logRef.current.scrollHeight;
-      }
-    }
-  }, [value, logRef, atBottom]);
-
-  const handleScroll = (event) => {
-    const { target } = event;
-    setAtBottom(target.scrollTop === target.scrollHeight - target.offsetHeight);
-  };
 
   return (
-    <List className={classes.list} ref={logRef} onScroll={handleScroll}>
-      {(value || []).map((entry, idx) => (
-        <ListItem dense divider key={idx}>
+    <FixedSizeList height={200} itemSize={32} itemCount={value.length}>
+      {({ index, style }) => (
+        <ListItem style={style} key={index}>
           <ListItemText
-            primaryTypographyProps={{ className: classes.text }}
-            primary={entry}
+            primary={value[index]}
+            primaryTypographyProps={{ className: classes.primary }}
           />
         </ListItem>
-      ))}
-    </List>
+      )}
+    </FixedSizeList>
   );
 }

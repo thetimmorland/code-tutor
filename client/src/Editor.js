@@ -41,10 +41,9 @@ export default function Editor() {
       value={code}
       tabSize={2}
       onChange={handleChange}
-      debounceChangePeriod={50}
-      annotations={[]}
-      width="100%"
+      debounceChangePeriod={10}
       height="100%"
+      width="100%"
     />
   );
 }
