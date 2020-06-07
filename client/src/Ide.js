@@ -107,6 +107,20 @@ export default function Ide() {
     };
   }, [id]);
 
+  useEffect(() => {
+    if (opsPending) {
+      function handleUnload(event) {
+        event.preventDefault();
+        event.returnValue = "Changes you made may not be saved.";
+      }
+      window.addEventListener("beforeunload", handleUnload);
+
+      return () => {
+        window.removeEventListener("beforeunload", handleUnload);
+      };
+    }
+  }, [opsPending]);
+
   const startSketch = () => {
     setSketch(getCode(docRef));
   };
