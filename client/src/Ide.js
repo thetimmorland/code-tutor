@@ -181,6 +181,8 @@ const deltaToOp = (editor) => (delta) => {
     return { p: ["code", start], si: str };
   } else if (delta.action === "remove") {
     return { p: ["code", start], sd: str };
+  } else {
+    throw new Error(`Invalid Delta: ${JSON.stringify(delta)}`);
   }
 };
 
