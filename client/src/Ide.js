@@ -52,7 +52,12 @@ export default function Ide() {
 
   useEffect(() => {
     const editor = ace.edit(aceRef.current);
-    editor.getSession().setMode("ace/mode/javascript");
+    editor.setOptions({
+      mode: "ace/mode/javascript",
+      tabSize: 2,
+      useSoftTabs: true,
+    });
+
     docRef.current = connection.get("collection", id);
 
     docRef.current.subscribe((err) => {
@@ -60,30 +65,32 @@ export default function Ide() {
 
       editor.session.setValue(docRef.current.data.code);
 
-      editor.session.on("change", (delta) => {
+      editor.session.on("change", function handleEditorDelta(delta) {
         if (editor.suppress) {
           return;
         }
 
-        console.log(delta);
-        setOpsPending(true);
-
-        setTimeout(function checkOps() {
-          if (docRef.current.opsPending) {
-            setTimeout(checkOps, 500);
-          } else {
-            setOpsPending(false);
-          }
-        }, 1000);
-
         const op = deltaToOp(editor)(delta);
         docRef.current.submitOp(op);
+
+        setOpsPending(true);
+
+        if (typeof handleEditorDelta.timeout != "undefined") {
+          clearTimeout(handleEditorDelta.timeout);
+        }
+
+        handleEditorDelta.timeout = setTimeout(function updateOpsPending() {
+          if (!docRef.current.pendingOps) {
+            setOpsPending(false);
+          } else {
+            setTimeout(updateOpsPending, 1000);
+          }
+        }, 1000);
       });
 
       docRef.current.on("op", (ops, source) => {
-        console.log(source);
+        // if op is from server
         if (!source) {
-          // if op is from server
           const deltas = ops.map(opToDelta(editor));
 
           // supress so deltas don't trigger change event
