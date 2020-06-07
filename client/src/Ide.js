@@ -57,7 +57,6 @@ export default function Ide() {
       mode: "ace/mode/javascript",
       tabSize: 2,
       useSoftTabs: true,
-      enableBasicAutoCompletion: true,
     });
 
     docRef.current = connection.get("collection", id);
@@ -82,10 +81,10 @@ export default function Ide() {
         }
 
         handleEditorDelta.timeout = setTimeout(function updateOpsPending() {
-          if (!docRef.current.pendingOps) {
+          if (docRef.current.pendingOps.length === 0) {
             setOpsPending(false);
           } else {
-            setTimeout(updateOpsPending, 1000);
+            handleEditorDelta.timeout = setTimeout(updateOpsPending, 1000);
           }
         }, 1000);
       });
