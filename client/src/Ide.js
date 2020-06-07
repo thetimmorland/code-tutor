@@ -18,7 +18,6 @@ import { useParams, Redirect } from "react-router-dom";
 
 import ace from "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/src-noconflict/theme-github";
 
 import useStyles from "./useStyles";
 import Sketch from "./Sketch";
@@ -53,6 +52,7 @@ export default function Ide() {
 
   useEffect(() => {
     const editor = ace.edit(aceRef.current);
+    editor.getSession().setMode("ace/mode/javascript");
     docRef.current = connection.get("collection", id);
 
     docRef.current.subscribe((err) => {
