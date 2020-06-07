@@ -56,7 +56,6 @@ export default function Ide() {
     editor.setOptions({
       mode: "ace/mode/javascript",
       tabSize: 2,
-      useSoftTabs: true,
     });
 
     docRef.current = connection.get("collection", id);
