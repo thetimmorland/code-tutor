@@ -26,7 +26,7 @@ var console = {
 <html><head></head><body></body></html>
 `.replace(/(\r\n|\n|\r)/gm, "");
 
-export default function Sketch({ value }) {
+const Sketch = React.memo(({ value }) => {
   const [log, setLog] = useState([]);
 
   useEffect(() => {
@@ -76,4 +76,6 @@ export default function Sketch({ value }) {
       <Log value={log} />
     </div>
   );
-}
+});
+
+export default Sketch;
