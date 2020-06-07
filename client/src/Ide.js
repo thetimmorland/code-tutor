@@ -122,8 +122,12 @@ export default function Ide() {
           <IconButton color="inherit" onClick={stopSketch}>
             <Stop />
           </IconButton>
-          <Link color="inherit" href="https://p5js.org/reference/">
-            <IconButton color="inherit" target="_blank">
+          <Link
+            color="inherit"
+            href="https://p5js.org/reference/"
+            target="_blank"
+          >
+            <IconButton color="inherit">
               <LibraryBooks />
             </IconButton>
           </Link>
