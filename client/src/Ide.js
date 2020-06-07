@@ -18,6 +18,7 @@ import { useParams, Redirect } from "react-router-dom";
 
 import ace from "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/webpack-resolver";
 
 import useStyles from "./useStyles";
 import Sketch from "./Sketch";
@@ -56,6 +57,7 @@ export default function Ide() {
       mode: "ace/mode/javascript",
       tabSize: 2,
       useSoftTabs: true,
+      enableBasicAutoCompletion: true,
     });
 
     docRef.current = connection.get("collection", id);
