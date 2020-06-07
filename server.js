@@ -22,8 +22,8 @@ app.get("/api/createSketch", (req, res) => {
       {
         code:
           "// TITLE: \n// AUTHOR:\n\n" +
-          "function setup() {\n  createCanvas(windowWidth, windowHeight);\n}\n\n" +
-          "function draw() {\n  background(220);\n  circle(mouseX, mouseY, 100);\n}",
+          'function setup() {\n  createCanvas(windowWidth, windowHeight);\n  print("Hello World!");\n}\n\n' +
+          "function draw() {\n  background(220);\n  circle(mouseX, mouseY, 50);\n}\n",
       },
       (err) => {
         if (err) throw err;
