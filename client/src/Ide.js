@@ -83,9 +83,9 @@ export default function Ide() {
           if (docRef.current.pendingOps.length === 0) {
             setOpsPending(false);
           } else {
-            handleEditorDelta.timeout = setTimeout(updateOpsPending, 1000);
+            handleEditorDelta.timeout = setTimeout(updateOpsPending, 250);
           }
-        }, 1000);
+        }, 250);
       });
 
       docRef.current.on("op", (ops, source) => {
