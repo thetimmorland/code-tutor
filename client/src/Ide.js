@@ -1,16 +1,31 @@
 import React, { useState, useEffect, useRef } from "react";
 
-import { AppBar, Toolbar, IconButton, Paper } from "@material-ui/core";
+import { AppBar, Toolbar, IconButton, Grid, Paper } from "@material-ui/core";
+import { PlayArrow, Stop } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/core/styles";
 
-import { PlayArrow, Stop, CallReceived } from "@material-ui/icons";
+import WebSocket from "reconnecting-websocket";
+import ShareDB from "sharedb/lib/client";
+import { useParams, Redirect } from "react-router-dom";
 
-import { useShare } from "./Share";
+import { diffChars } from "diff";
+
+import AceEditor from "react-ace";
+import "ace-builds/src-noconflict/mode-javascript";
+import "ace-builds/src-noconflict/theme-github";
+import "ace-builds/webpack-resolver.js";
 
 import Sketch from "./Sketch";
-import Editor from "./Editor";
-import Log from "./Log";
 
-import { makeStyles } from "@material-ui/core/styles";
+const socket = new WebSocket(
+  (window.location.protocol === "https:" ? "wss://" : "ws://") +
+    (process.env.NODE_ENV === "production"
+      ? window.location.host
+      : "localhost:8080") +
+    "/websocket"
+);
+
+const connection = new ShareDB.Connection(socket);
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -24,54 +39,79 @@ const useStyles = makeStyles((theme) => ({
   main: {
     flexGrow: 1,
     display: "flex",
-    marginBottom: theme.spacing(1),
-    marginRight: theme.spacing(1),
-  },
-  content: {
-    display: "flex",
-    flexGrow: 1,
-    flexBasis: "auto",
-  },
-  column: {
-    flexGrow: 1,
-    display: "flex",
-    flexDirection: "column",
+    padding: theme.spacing(1),
   },
   paper: {
-    marginLeft: theme.spacing(1),
-    marginTop: theme.spacing(1),
+    height: "100%",
+    width: "100%",
+    minHeight: 300,
     padding: theme.spacing(1),
   },
 }));
 
+const getCode = (docRef) => {
+  const { current } = docRef;
+  const { data } = current || {};
+  const { code } = data || {};
+  return code;
+};
+
 export default function Ide() {
   const classes = useStyles();
-  const { value } = useShare() || {};
-  const { code } = value || {};
-  const codeRef = useRef(null);
+  const { id } = useParams();
+
+  const docRef = useRef(null);
+
+  const [subscribed, setSubscribed] = useState(false);
+  const [code, setCode] = useState("");
+  const [sketch, setSketch] = useState("");
 
   useEffect(() => {
-    codeRef.current = code;
-  }, [code]);
+    docRef.current = connection.get("collection", id);
 
-  const [sketch, setSketch] = useState("");
-  const [log, setLog] = useState([]);
+    docRef.current.subscribe((err) => {
+      if (err) throw err;
+
+      setCode(getCode(docRef));
+
+      docRef.current.on("op", (source) => {
+        setCode(getCode(docRef));
+      });
+
+      setSubscribed(true);
+    });
+
+    return () => {
+      docRef.current.destroy();
+    };
+  }, [id]);
 
   const startSketch = () => {
-    setSketch(codeRef.current);
+    setSketch(getCode(docRef));
   };
 
   const stopSketch = () => {
     setSketch("");
   };
 
-  useEffect(() => {
-    if (sketch) {
-      setLog(["Starting Sketch..."]);
-    } else {
-      setLog((log) => [...log, "Sketch Stopped."]);
-    }
-  }, [sketch]);
+  const handleChange = (newCode) => {
+    const diff = diffChars(getCode(docRef), newCode);
+
+    let offset = 0;
+    diff.forEach(({ count, value, added, removed }) => {
+      if (added) {
+        docRef.current.submitOp({ p: ["code", offset], si: value });
+      } else if (removed) {
+        docRef.current.submitOp({ p: ["code", offset], sd: value });
+      }
+
+      if (!removed) offset += count;
+    });
+  };
+
+  if (docRef.current && !docRef.current.type) {
+    return <Redirect to="/" />;
+  }
 
   return (
     <div className={classes.root}>
@@ -87,29 +127,28 @@ export default function Ide() {
       </AppBar>
       <div className={classes.appBarSpacer} />
       <main className={classes.main}>
-        <div className={classes.column}>
-          <Paper
-            className={classes.paper}
-            style={{ flexGrow: 1 }}
-            variant="outlined"
-            square
-          >
-            <Editor />
-          </Paper>
-          <Paper className={classes.paper} variant="outlined" square>
-            <Log value={log} />
-          </Paper>
-        </div>
-        <div className={classes.column}>
-          <Paper
-            className={classes.paper}
-            style={{ flexGrow: 1 }}
-            variant="outlined"
-            square
-          >
-            <Sketch value={sketch} setLog={setLog} />
-          </Paper>
-        </div>
+        <Grid container spacing={2}>
+          <Grid item md={6} xs={12}>
+            <Paper className={classes.paper}>
+              {subscribed && (
+                <AceEditor
+                  mode="javascript"
+                  theme="github"
+                  value={code}
+                  onChange={handleChange}
+                  tabSize={2}
+                  height="100%"
+                  width="100%"
+                />
+              )}
+            </Paper>
+          </Grid>
+          <Grid item md={6} xs={12}>
+            <Paper className={classes.paper}>
+              <Sketch value={sketch} />
+            </Paper>
+          </Grid>
+        </Grid>
       </main>
     </div>
   );
