@@ -122,14 +122,11 @@ export default function Ide() {
           <IconButton color="inherit" onClick={stopSketch}>
             <Stop />
           </IconButton>
-          <IconButton
-            component={Link}
-            color="inherit"
-            href="https://p5js.org/reference/"
-            target="_blank"
-          >
-            <LibraryBooks />
-          </IconButton>
+          <Link color="inherit" href="https://p5js.org/reference/">
+            <IconButton color="inherit" target="_blank">
+              <LibraryBooks />
+            </IconButton>
+          </Link>
           <div className={classes.toolBarSpacer} />
           {opsPending && (
             <CircularProgress
