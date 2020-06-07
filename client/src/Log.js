@@ -8,7 +8,7 @@ export default function Log({ value }) {
       <FixedSizeList
         className="Log"
         height={200}
-        itemSize={32}
+        itemSize={24}
         itemCount={value.length}
         style={{
           fontFamily: "monospace",
@@ -23,7 +23,6 @@ export default function Log({ value }) {
               fontFamily: "monospace",
               whiteSpace: "pre-line",
             }}
-            gutterBottom
           >
             {value[index]}
           </Typography>

@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
-import {  Divider } from "@material-ui/core";
+import { Divider } from "@material-ui/core";
 import Log from "./Log";
 
 const docTemplate = `
-<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
 <style type="text/css">body { margin: 0px; padding 0px; font-size: 0 }</style>
-<html><head></head><body></body></html>
 <script>
 window.onerror = function (text, url, row, column, error) {
   const payload = row + ":" + column + " " + text;
-  window.parent.postMessage({ source: "code-tutor-bridge", payload}, '*');
+  window.parent.postMessage({ source: "code-tutor-bridge", payload }, '*');
   return true;
 };
 var console = {
@@ -24,7 +22,9 @@ var console = {
   }
 };
 </script>
-`;
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+<html><head></head><body></body></html>
+`.replace(/(\r\n|\n|\r)/gm, "");
 
 export default function Sketch({ value }) {
   const [log, setLog] = useState([]);
@@ -33,10 +33,8 @@ export default function Sketch({ value }) {
     function eventHandler(message) {
       if (message.data.source === "code-tutor-bridge") {
         const { payload } = message.data;
-        if (typeof payload === "string") {
-          console.log(payload);
-          setLog((log) => [...log, payload]);
-        }
+        console.log(payload);
+        setLog((log) => [...log, payload]);
       }
     }
 
@@ -46,6 +44,14 @@ export default function Sketch({ value }) {
       window.removeEventListener("message", eventHandler);
     };
   }, []);
+
+  useEffect(() => {
+    if (value === "") {
+      setLog((log) => [...log, "Sketch Stopped."]);
+    } else {
+      setLog(["Starting Sketch..."]);
+    }
+  }, [value]);
 
   const parser = new DOMParser();
   const srcDoc = parser.parseFromString(docTemplate, "text/html");
@@ -67,7 +73,7 @@ export default function Sketch({ value }) {
         />
       </div>
       <Divider />
-        <Log value={log} />
+      <Log value={log} />
     </div>
   );
 }
