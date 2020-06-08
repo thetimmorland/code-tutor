@@ -72,7 +72,6 @@ const Sketch = React.memo(({ value }) => {
           style={{ height: "100%", width: "100%" }}
         />
       </div>
-      <Divider />
       <Log value={log} />
     </div>
   );
