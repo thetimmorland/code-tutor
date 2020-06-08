@@ -61,7 +61,7 @@ export default function Log({ value }) {
             onChange={handleCheckBox}
             control={<Checkbox color="primary" />}
             label="Autoscroll"
-            labelPlacement="end"
+            labelPlacement="start"
           />
         </Grid>
       </Grid>
