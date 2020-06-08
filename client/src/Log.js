@@ -49,7 +49,6 @@ export default function Log({ value }) {
 
   return (
     <div>
-      <Divider />
       <Grid container alignItems="center" justify="space-between">
         <Grid item>
           <Typography variant="h6" color="primary">
