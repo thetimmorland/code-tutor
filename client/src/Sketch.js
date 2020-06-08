@@ -67,12 +67,14 @@ const Sketch = React.memo(({ value }) => {
           className="Sketch"
           title="sketch"
           srcDoc={srcDoc.documentElement.outerHTML}
-          frameBorder={0}
           sandbox="allow-scripts allow-pointer-lock allow-same-origin allow-popups allow-forms allow-modals"
-          style={{ height: "100%", width: "100%" }}
+          style={{
+            height: "100%",
+            width: "100%",
+            border: "1px grey solid",
+          }}
         />
       </div>
-      <Divider />
       <Log value={log} />
     </div>
   );

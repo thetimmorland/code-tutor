@@ -1,10 +1,17 @@
 import React from "react";
 import { VariableSizeList as List } from "react-window";
-import { Typography, Divider } from "@material-ui/core";
+import {
+  Checkbox,
+  Typography,
+  FormControlLabel,
+  Divider,
+  Grid,
+} from "@material-ui/core";
 
 export default function Log({ value }) {
   const rootRef = React.useRef(null);
   const [windowWidth, setWindowWidth] = React.useState(null);
+  const [autoScroll, setAutoScroll] = React.useState(true);
 
   React.useEffect(() => {
     function handleResize() {
@@ -18,6 +25,12 @@ export default function Log({ value }) {
     };
   }, []);
 
+  React.useEffect(() => {
+    if (autoScroll) {
+      rootRef.current.scrollToItem(value.length - 1);
+    }
+  }, [autoScroll, value]);
+
   const sizeMap = React.useRef({});
 
   const setSize = React.useCallback((index, size) => {
@@ -30,28 +43,51 @@ export default function Log({ value }) {
     []
   );
 
+  const handleCheckBox = (event) => {
+    setAutoScroll(event.target.checked);
+  };
+
   return (
-    <List
-      ref={rootRef}
-      height={200}
-      width="100%"
-      itemCount={value.length}
-      itemSize={getSize}
-      style={{
-        fontFamily: "monospace",
-      }}
-    >
-      {({ index, style }) => (
-        <div style={style}>
-          <Message
-            message={value[index]}
-            index={index}
-            setHeight={setSize}
-            width={windowWidth}
+    <div>
+      <Grid container alignItems="center" justify="space-between">
+        <Grid item>
+          <Typography variant="h6" color="primary">
+            Console
+          </Typography>
+        </Grid>
+        <Grid item>
+          <FormControlLabel
+            checked={autoScroll}
+            onChange={handleCheckBox}
+            control={<Checkbox color="primary" />}
+            label="Autoscroll"
+            labelPlacement="end"
           />
-        </div>
-      )}
-    </List>
+        </Grid>
+      </Grid>
+      <Divider />
+      <List
+        ref={rootRef}
+        height={200}
+        width="100%"
+        itemCount={value.length}
+        itemSize={getSize}
+        style={{
+          fontFamily: "monospace",
+        }}
+      >
+        {({ index, style }) => (
+          <div style={style}>
+            <Message
+              message={value[index]}
+              index={index}
+              setHeight={setSize}
+              width={windowWidth}
+            />
+          </div>
+        )}
+      </List>
+    </div>
   );
 }
 
