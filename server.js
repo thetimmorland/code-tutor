@@ -21,7 +21,7 @@ app.get("/api/createSketch", (req, res) => {
     doc.create(
       {
         code:
-          "// TITLE: \n// AUTHOR:\n\n" +
+          "// TITLE:\n// AUTHOR:\n\n" +
           'function setup() {\n  createCanvas(windowWidth, windowHeight);\n  print("Hello World!");\n}\n\n' +
           "function draw() {\n  background(220);\n  circle(mouseX, mouseY, 50);\n}\n",
       },
