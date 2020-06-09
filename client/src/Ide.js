@@ -18,13 +18,15 @@ import { useParams, Redirect } from "react-router-dom";
 
 import ace from "ace-builds/src-noconflict/ace";
 import "ace-builds/src-noconflict/mode-javascript";
-import "ace-builds/webpack-resolver";
+import "ace-builds/webpack-resolver"; // needed for webpack
 
 import useStyles from "./useStyles";
 import Sketch from "./Sketch";
 
 const socket = new WebSocket(
+  // set websocket protocol depending on ssl status of page
   (window.location.protocol === "https:" ? "wss://" : "ws://") +
+    // set websocket location depending on nodeENV
     (process.env.NODE_ENV === "production"
       ? window.location.host
       : "localhost:8080") +
@@ -33,25 +35,26 @@ const socket = new WebSocket(
 
 const connection = new ShareDB.Connection(socket);
 
+// helper function to extract code from a shareDb docRef
 const getCode = (docRef) => {
   const { current } = docRef;
   const { data } = current || {};
   const { code } = data || {};
-  return code;
+  return code || "";
 };
 
 export default function Ide() {
   const classes = useStyles();
 
-  const { id } = useParams();
+  const { id } = useParams(); // doc id
 
-  const aceRef = useRef(null);
-  const docRef = useRef(null);
+  const aceRef = useRef(null); // points to editor
+  const docRef = useRef(null); // points to sharedb doc
 
-  const [opsPending, setOpsPending] = useState(false);
-  const [sketch, setSketch] = useState("");
+  const [opsPending, setOpsPending] = useState(false); // indicates save status
 
   useEffect(() => {
+    // create editor object and apply settings
     const editor = ace.edit(aceRef.current);
     editor.setOptions({
       mode: "ace/mode/javascript",
@@ -64,9 +67,11 @@ export default function Ide() {
     docRef.current.subscribe((err) => {
       if (err) throw err;
 
+      // set editor to inital state`
       editor.session.setValue(docRef.current.data.code);
 
       editor.session.on("change", function handleEditorDelta(delta) {
+        // if delta emitted due to remote change do nothing
         if (editor.suppress) {
           return;
         }
@@ -76,10 +81,7 @@ export default function Ide() {
 
         setOpsPending(true);
 
-        if (typeof handleEditorDelta.timeout != "undefined") {
-          clearTimeout(handleEditorDelta.timeout);
-        }
-
+        // setup recursive timeout to check every second if ops have been sent yet
         handleEditorDelta.timeout = setTimeout(function updateOpsPending() {
           if (docRef.current.pendingOps.length === 0) {
             setOpsPending(false);
@@ -87,16 +89,29 @@ export default function Ide() {
             handleEditorDelta.timeout = setTimeout(updateOpsPending, 1000);
           }
         }, 1000);
+
+        // clear previous timeout if this function was called again before the last one finished
+        if (typeof handleEditorDelta.timeout != "undefined") {
+          clearTimeout(handleEditorDelta.timeout);
+        }
       });
 
       docRef.current.on("op", (ops, source) => {
-        // if op is from server
+        // only apply ops which are remote
         if (!source) {
-          const deltas = ops.map(opToDelta(editor));
+          const { session } = editor;
 
-          // supress so deltas don't trigger change event
+          // prepare for application of operations to editor by:
+          // 1. setting global variable which prevents the delta handler from emitting events
+          // 2. creating a new undo group which can be ignored and kept off the local undo stack
+
           editor.suppress = true;
-          editor.session.getDocument().applyDeltas(deltas);
+          const remoteChange = session.$undoManager.startNewGroup();
+
+          const deltas = ops.map(opToDelta(editor));
+          session.getDocument().applyDeltas(deltas);
+
+          session.$undoManager.markIgnored(remoteChange);
           editor.suppress = false;
         }
       });
@@ -109,6 +124,7 @@ export default function Ide() {
   }, [id]);
 
   useEffect(() => {
+    // warn on page close if ops are pending
     if (opsPending) {
       function handleUnload(event) {
         event.preventDefault();
@@ -122,6 +138,8 @@ export default function Ide() {
     }
   }, [opsPending]);
 
+  const [sketch, setSketch] = useState(""); // frozen state of code sent to sketch runner
+
   const startSketch = () => {
     setSketch(getCode(docRef));
   };
@@ -130,6 +148,7 @@ export default function Ide() {
     setSketch("");
   };
 
+  // if doc doesn't exist redirect
   if (docRef.current && !docRef.current.type) {
     return <Redirect to="/" />;
   }
@@ -185,6 +204,7 @@ export default function Ide() {
   );
 }
 
+// converts an ace editor delta object to a sharedb operation
 const deltaToOp = (editor) => (delta) => {
   const aceDoc = editor.session.getDocument();
   const start = aceDoc.positionToIndex(delta.start);
@@ -199,6 +219,7 @@ const deltaToOp = (editor) => (delta) => {
   }
 };
 
+// converts a sharedb operation to an ace editor delta object
 const opToDelta = (editor) => (op) => {
   console.log(op);
   const index = op.p[1];

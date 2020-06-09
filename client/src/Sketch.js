@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Divider } from "@material-ui/core";
 import Log from "./Log";
 
+// doc template containing error and console hijackers
+// template is flattened to a single line so errors in user code have correct line numbers
 const docTemplate = `
 <style type="text/css">body { margin: 0px; padding 0px; font-size: 0 }</style>
 <script>
@@ -27,9 +28,11 @@ var console = {
 `.replace(/(\r\n|\n|\r)/gm, "");
 
 const Sketch = React.memo(({ value }) => {
-  const [log, setLog] = useState([]);
+  const [log, setLog] = useState([]); // console state
 
   useEffect(() => {
+    // messages emitted by hijacked console and error events are caught here
+    // and applied to log array
     function eventHandler(message) {
       if (message.data.source === "code-tutor-bridge") {
         const { payload } = message.data;
@@ -46,6 +49,7 @@ const Sketch = React.memo(({ value }) => {
   }, []);
 
   useEffect(() => {
+    // add messages to log when code starts or stops
     if (value === "") {
       setLog((log) => [...log, "Sketch Stopped."]);
     } else {
@@ -53,9 +57,9 @@ const Sketch = React.memo(({ value }) => {
     }
   }, [value]);
 
+  // insert user code into template
   const parser = new DOMParser();
   const srcDoc = parser.parseFromString(docTemplate, "text/html");
-
   const sketch = srcDoc.createElement("script");
   sketch.innerHTML = value || "";
   srcDoc.head.appendChild(sketch);

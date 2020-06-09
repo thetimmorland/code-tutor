@@ -14,6 +14,7 @@ export default function Log({ value }) {
   const [autoScroll, setAutoScroll] = React.useState(true);
 
   React.useEffect(() => {
+    // listen to resize events so log messages can recalculate their height
     function handleResize() {
       setWindowWidth(window.innerWidth);
     }
@@ -31,6 +32,7 @@ export default function Log({ value }) {
     }
   }, [autoScroll, value]);
 
+  // sizes (heights) for each log message
   const sizeMap = React.useRef({});
 
   const setSize = React.useCallback((index, size) => {
@@ -95,8 +97,9 @@ function Message({ message, index, setHeight, width }) {
   const rootRef = React.useRef(null);
 
   React.useEffect(() => {
+    // on initial render and resize set own height
     setHeight(index, rootRef.current.getBoundingClientRect().height);
-  }, [width]);
+  }, [setHeight, index, width]);
 
   return (
     <div ref={rootRef}>
