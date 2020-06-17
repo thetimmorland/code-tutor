@@ -81,6 +81,11 @@ export default function Ide() {
 
         setOpsPending(true);
 
+        // clear previous timeout if this function was called again before the last one finished
+        if (typeof handleEditorDelta.timeout != "undefined") {
+          clearTimeout(handleEditorDelta.timeout);
+        }
+
         // setup recursive timeout to check every second if ops have been sent yet
         handleEditorDelta.timeout = setTimeout(function updateOpsPending() {
           if (docRef.current.pendingOps.length === 0) {
@@ -89,11 +94,6 @@ export default function Ide() {
             handleEditorDelta.timeout = setTimeout(updateOpsPending, 1000);
           }
         }, 1000);
-
-        // clear previous timeout if this function was called again before the last one finished
-        if (typeof handleEditorDelta.timeout != "undefined") {
-          clearTimeout(handleEditorDelta.timeout);
-        }
       });
 
       docRef.current.on("op", (ops, source) => {
